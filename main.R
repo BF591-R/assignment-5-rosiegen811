@@ -115,11 +115,7 @@ label_res <- function(deseq2_res, padj_threshold) {
           !is.na(padj) & padj < padj_threshold & log2FoldChange < 0 ~ "DOWN",
           TRUE ~ "NS"
         )
-      ) |> 
-      dplyr::select(any_of(c(
-        "genes", "volc_plot_status", "log2FoldChange", "padj",
-        "baseMean", "lfcSE", "stat", "pvalue"
-      )))
+      )
 
     return(res_tibble)
 }
