@@ -274,12 +274,13 @@ make_ranked_log2fc <- function(labeled_results, id2gene_path) {
     # Join with the DESeq2 results and remove missing values.
     merged <- labeled_results |> 
       inner_join(id2gene, by = c("genes" = "ensembl_gene_id")) |> 
-      filter(!is.na(log2FoldChange), !is.na(gene_symbol))
+      filter(!is.na(log2FoldChange), !is.na(gene_symbol)) |> 
+      arrange(desc(log2FoldChange)) |> 
+      distinct(gene_symbol, .keep_all = TRUE)
     
     # Convert to named vector as specified, with log2FoldChange values in descending order.
     ranked_vec <- merged$log2FoldChange
     names(ranked_vec) <- merged$gene_symbol
-    ranked_vec <- sort(ranked_vec, decreasing = TRUE)
     
     return(ranked_vec)
 }
@@ -309,7 +310,8 @@ run_fgsea <- function(gmt_file_path, rnk_list, min_size, max_size) {
       pathways = pathways,
       stats = rnk_list,
       minSize = min_size,
-      maxSize = max_size
+      maxSize = max_size,
+      nproc = 1
     )
 
     # Convert to a tibble.
